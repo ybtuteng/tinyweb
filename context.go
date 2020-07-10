@@ -3,7 +3,9 @@ package tinyweb
 import "net/http"
 
 type Context struct {
-	Writer http.ResponseWriter
+	Request *http.Request
+	Writer  http.ResponseWriter
+
 	Params Params
 }
 

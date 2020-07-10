@@ -42,12 +42,16 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	node := e.Find(r.URL.Path)
+	node := e.Find(r.URL.Path, r.Method)
 	if node == nil {
+		e.serveError(w, 404, "resource not found")
 		return
 	}
 
-	context := Context{}
+	context := Context{
+		Request: r,
+		Writer:  w,
+	}
 	e.before(node, context)
 
 	data, err := ioutil.ReadAll(r.Body)
@@ -57,7 +61,7 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ft := reflect.TypeOf(node.handler)
-	req := newReqInstance(ft.In(0))
+	req := newReqInstance(ft.In(1))
 	err = json.Unmarshal(data, req)
 	if err != nil {
 		log.Printf("ServeHTTP unmarshal request error %v", err)
@@ -67,6 +71,7 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	injector := NewInjector()
 	injector.Map(req)
+	injector.Map(context)
 	ret, err := injector.Invoke(node.handler)
 	if err != nil {
 		log.Printf("ServeHTTP inject invoke error %v", err)

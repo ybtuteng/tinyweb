@@ -21,7 +21,7 @@ type HelloReq struct {
 	Content string
 }
 
-func SayHello(h *HelloReq) *HelloRsp {
+func SayHello(c tinyweb.Context, h *HelloReq) *HelloRsp {
 	log.Println(h.Content)
 	return &HelloRsp{
 		Content: "HelloRsp",
@@ -32,9 +32,9 @@ type Print struct {
 }
 
 func (l *Print) Before(c tinyweb.Context) {
-	log.Println("before", c.Param("before"))
+	log.Println("before", c.Request.Header.Get("before"))
 }
 
 func (l *Print) After(c tinyweb.Context) {
-	log.Println("after", c.Param("after"))
+	log.Println("after", c.Request.Header.Get("after"))
 }
