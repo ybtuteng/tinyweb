@@ -9,6 +9,7 @@ import (
 func main() {
 	r := tinyweb.NewEngine()
 	r.POST("/index", SayHello, &Print{})
+	r.POST("/yes/:id", SayYes)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
@@ -25,6 +26,13 @@ func SayHello(c tinyweb.Context, h *HelloReq) *HelloRsp {
 	log.Println(h.Content)
 	return &HelloRsp{
 		Content: "HelloRsp",
+	}
+}
+
+func SayYes(c tinyweb.Context, h *HelloReq) *HelloRsp {
+	log.Println(h.Content)
+	return &HelloRsp{
+		Content: "yes",
 	}
 }
 
